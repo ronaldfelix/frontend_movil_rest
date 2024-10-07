@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         // restart instead.
         //
         // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
+        // tested with just a hot reload. Manuel ve a la clase de calidad
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
