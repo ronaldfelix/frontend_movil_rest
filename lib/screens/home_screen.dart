@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/search_bar.dart';
 import '../services/search_service.dart';
+import '../services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,7 +11,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //Metodo buscar
+  String userName = "Usuario";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final fetchedUserName = await fetchUserName(2);
+    setState(() {
+      userName = fetchedUserName;
+    });
+  }
+
+  // Método buscar
   List<String> _searchResults = [];
   void _onSearch(String query) async {
     if (query.isEmpty) {
@@ -31,18 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.grey[300],
       body: Stack(
         children: [
-          //Bienvenida+ofertas
+          // Bienvenida + ofertas
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 80),
+                const SizedBox(height: 100),
                 Container(
                   alignment: Alignment.center,
-                  child: const Text(
-                    'Bienvenido Ronald',
-                    style: TextStyle(
+                  child: Text(
+                    'BIENVENIDO(A)\n$userName',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -89,17 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-
           // Barra de búsqueda en la parte superior
           Positioned(
-            top: 0,
+            top: 30,
             left: 0,
             right: 0,
             child: HomeSearchBar(
               onSearch: _onSearch,
             ),
           ),
-
           // Sugerencias de búsqueda que aparecen por encima
           if (_searchResults.isNotEmpty)
             Positioned(
@@ -130,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         ],
       ),
-
       // Barra inferior
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
