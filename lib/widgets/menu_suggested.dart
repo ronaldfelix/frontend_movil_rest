@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/menu_service.dart'; // Importa el servicio de menú
-import '../config/config.dart'; // Importa la clase de configuración
+import '../services/menu_service.dart';
+import '../config/config.dart';
 
 class MenuSuggested extends StatefulWidget {
   const MenuSuggested({super.key});
@@ -26,11 +26,9 @@ class _MenuSuggestedState extends State<MenuSuggested> {
       future: _menus,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: CircularProgressIndicator()); // Mostrar cargando
+          return const Center(child: CircularProgressIndicator()); //  cargando
         } else if (snapshot.hasError) {
-          return const Center(
-              child: Text('Error al cargar los menús')); // Mostrar error
+          return const Center(child: Text('Error al cargar los menús'));
         } else if (snapshot.hasData) {
           final menus = snapshot.data!;
 
@@ -76,8 +74,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
                 topRight: Radius.circular(15),
               ),
               image: DecorationImage(
-                image: NetworkImage(
-                    '${Config.baseUrl}/${menu['imagen_url']}'), // Construir la URL de imagen
+                image: NetworkImage('${Config.baseUrl}/${menu['imagen_url']}'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -85,7 +82,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              menu['nombre'], // Mostrar el nombre del menú
+              menu['nombre'],
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -95,7 +92,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              '\$${menu['precio'].toString()}', // Mostrar el precio del menú
+              'S/ ${menu['precio'].toString()}',
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.grey,

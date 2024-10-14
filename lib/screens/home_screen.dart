@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../widgets/search_bar.dart';
-import '../widgets/offer_banner.dart';
-import '../widgets/menu_suggested.dart'; // Mantén la importación de MenuSuggested
-import '../widgets/menu_bar.dart';
+import '../widgets/home_screen/search_bar.dart';
+import '../widgets/home_screen/offer_banner.dart';
+import '../widgets/home_screen/top_pedidos.dart';
+import '../widgets/home_screen/menu_bar.dart';
 import '../services/search_service.dart';
 import '../services/user_service.dart';
+import 'menu_screen.dart'; // Pantalla del menú
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userName = "Usuario";
+  int _selectedIndex = 0; // Controla el índice de la pestaña seleccionada
 
   @override
   void initState() {
@@ -44,26 +46,43 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Cambiar de pantalla
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MenuScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text('Mi Aplicación de Restaurante'),
+      ),
       body: Stack(
         children: [
-          // Bienvenida + ofertas + menú sugerido
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
+          if (_selectedIndex == 0) ...[
+            // Pantalla de Inicio
+            SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 100),
                   Container(
                     alignment: Alignment.center,
-                    child: Text(
-                      'BIENVENIDO(A)\n$userName',
+                    child: const Text(
+                      'BIENVENIDO(A)',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -76,18 +95,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  const OfferBanner(), // Usa el widget OfferBanner
+                  const OfferBanner(),
                   const SizedBox(height: 20),
                   const Text(
-                    'Menú Sugerido',
+                    'Top Pedidos',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  const MenuSuggested(), // Usa el widget MenuSuggested actualizado
+                  const TopPedidos(),
                 ],
               ),
             ),
-          ),
+          ],
           // Barra de búsqueda en la parte superior
           Positioned(
             top: 30,
@@ -127,8 +146,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         ],
       ),
-      // Barra de menú inferior
-      bottomNavigationBar: const BottomMenuBar(), // Usa el widget BottomMenuBar
+      bottomNavigationBar: BottomMenuBar(
+        currentIndex: _selectedIndex,
+        onTap: _onTabTapped, // Cambiar de pestaña
+      ),
     );
   }
 }

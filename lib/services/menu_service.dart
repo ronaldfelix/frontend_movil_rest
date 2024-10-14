@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../config/config.dart'; // Importa la clase de configuración
+import '../config/config.dart';
 
 class MenuService {
   Future<List<dynamic>> fetchMenus() async {
