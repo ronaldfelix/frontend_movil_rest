@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/search_bar.dart';
+import '../widgets/offer_banner.dart';
+import '../widgets/menu_suggested.dart'; // Mantén la importación de MenuSuggested
+import '../widgets/menu_bar.dart';
 import '../services/search_service.dart';
 import '../services/user_service.dart';
 
@@ -20,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadUserName() async {
-    final fetchedUserName = await fetchUserName(2);
+    final fetchedUserName = await fetchUserName(3);
     setState(() {
       userName = fetchedUserName;
     });
@@ -47,63 +50,42 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.grey[300],
       body: Stack(
         children: [
-          // Bienvenida + ofertas
+          // Bienvenida + ofertas + menú sugerido
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 100),
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'BIENVENIDO(A)\n$userName',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Ofertas',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                    image: const DecorationImage(
-                      image: AssetImage('assets/food.jpg'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(5, (index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: index == 0 ? Colors.black : Colors.grey,
-                            ),
-                          );
-                        }),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 100),
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'BIENVENIDO(A)\n$userName',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Ofertas',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const OfferBanner(), // Usa el widget OfferBanner
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Menú Sugerido',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const MenuSuggested(), // Usa el widget MenuSuggested actualizado
+                ],
+              ),
             ),
           ),
           // Barra de búsqueda en la parte superior
@@ -145,19 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
         ],
       ),
-      // Barra inferior
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant_menu), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-          BottomNavigationBarItem(icon: Icon(Icons.help), label: 'Ayuda'),
-        ],
-        selectedItemColor: Colors.black87,
-        unselectedItemColor: Colors.black54,
-      ),
+      // Barra de menú inferior
+      bottomNavigationBar: const BottomMenuBar(), // Usa el widget BottomMenuBar
     );
   }
 }
