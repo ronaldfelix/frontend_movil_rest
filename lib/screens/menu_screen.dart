@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/menu_suggested.dart'; // Importa el widget de menú sugerido
-import '../widgets/home_screen/menu_bar.dart'; // Importa la barra de menú
+import '../widgets/menu_screen/menu_suggested.dart';
+import '../widgets/menu_bar.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -10,19 +10,18 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int _selectedIndex = 1; // Configura la pestaña activa en "Menú"
+  int _selectedIndex = 1;
 
-  // Manejar el cambio de pestañas desde el BottomMenuBar
+  // cambiar pestañas
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navegar a la pantalla correspondiente
+    // Navegar a pestaña anterior
     if (index == 0) {
-      Navigator.pop(context); // Volver al HomeScreen
+      Navigator.pop(context);
     }
-    // Puedes añadir navegación a otras pestañas aquí si es necesario
   }
 
   @override
@@ -52,8 +51,8 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
       // Agrega la barra de menú en el MenuScreen
       bottomNavigationBar: BottomMenuBar(
-        currentIndex: _selectedIndex, // Muestra que la pestaña activa es "Menú"
-        onTap: _onTabTapped, // Llama a la función para cambiar de pestaña
+        currentIndex: _selectedIndex,
+        onTap: _onTabTapped,
       ),
     );
   }

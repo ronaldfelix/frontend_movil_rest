@@ -4,7 +4,6 @@ import '../config/config.dart';
 
 class MenuService {
   Future<List<dynamic>> fetchMenus() async {
-    // Construir el endpoint usando la URL base de Config
     final url = Uri.parse('${Config.baseUrl}/api/menu');
 
     try {

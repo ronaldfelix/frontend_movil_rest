@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 class BottomMenuBar extends StatelessWidget {
-  final int currentIndex; // El índice de la pestaña seleccionada
-  final ValueChanged<int>
-      onTap; // Callback para manejar el toque en una pestaña
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
   const BottomMenuBar({
     Key? key,
-    required this.currentIndex, // Asegura que el índice sea proporcionado
-    required this.onTap, // Asegura que la función onTap sea proporcionada
+    required this.currentIndex,
+    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: currentIndex, // Muestra la pestaña seleccionada
-      onTap: onTap, // Llama al callback cuando se toca una pestaña
+      currentIndex: currentIndex,
+      onTap: onTap,
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),

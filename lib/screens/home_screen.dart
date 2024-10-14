@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../widgets/home_screen/search_bar.dart';
 import '../widgets/home_screen/offer_banner.dart';
 import '../widgets/home_screen/top_pedidos.dart';
-import '../widgets/home_screen/menu_bar.dart';
+import '../widgets/menu_bar.dart';
 import '../services/search_service.dart';
 import '../services/user_service.dart';
-import 'menu_screen.dart'; // Pantalla del menú
+import 'menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,22 +16,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userName = "Usuario";
-  int _selectedIndex = 0; // Controla el índice de la pestaña seleccionada
+  int _selectedIndex = 0; //indice de ventanas
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
-  }
+  } //Cargar usuario al inicio
 
   Future<void> _loadUserName() async {
     final fetchedUserName = await fetchUserName(3);
     setState(() {
       userName = fetchedUserName;
-    });
+    }); //hacer llamado a la bd para obtener un usuario
   }
 
-  // Método buscar
+  // enlistar busqueda
   List<String> _searchResults = [];
   void _onSearch(String query) async {
     if (query.isEmpty) {
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Cambiar de pantalla
+  // Cambiar de screen
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -63,60 +63,66 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text('Mi Aplicación de Restaurante'),
-      ),
       body: Stack(
         children: [
           if (_selectedIndex == 0) ...[
-            // Pantalla de Inicio
             SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 100),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'BIENVENIDO(A)',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 120),
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'BIENVENIDO(A)\n$userName',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Ofertas',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  const OfferBanner(),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Top Pedidos',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  const TopPedidos(),
-                ],
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Ofertas',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const OfferBanner(),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Top Pedidos',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const TopPedidos(),
+                  ],
+                ),
               ),
             ),
           ],
           // Barra de búsqueda en la parte superior
           Positioned(
             top: 30,
-            left: 0,
-            right: 0,
-            child: HomeSearchBar(
-              onSearch: _onSearch,
+            left: 16,
+            right: 16,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: HomeSearchBar(
+                onSearch: _onSearch,
+              ),
             ),
           ),
-          // Sugerencias de búsqueda que aparecen por encima
+          // Sugerencias de búsqueda
           if (_searchResults.isNotEmpty)
             Positioned(
               top: 80,

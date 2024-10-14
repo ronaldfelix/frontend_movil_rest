@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/menu_service.dart';
-import '../config/config.dart';
+import '../../services/menu_service.dart';
+import '../../config/config.dart';
 
 class MenuSuggested extends StatefulWidget {
   const MenuSuggested({super.key});
@@ -16,8 +16,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
   @override
   void initState() {
     super.initState();
-    _menus =
-        MenuService().fetchMenus(); // Cargar los menús al iniciar el widget
+    _menus = MenuService().fetchMenus(); // Cargar los menús al iniciar
   }
 
   @override
@@ -26,7 +25,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
       future: _menus,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator()); //  cargando
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return const Center(child: Text('Error al cargar los menús'));
         } else if (snapshot.hasData) {
@@ -36,10 +35,10 @@ class _MenuSuggestedState extends State<MenuSuggested> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Número de columnas
+              crossAxisCount: 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
-              childAspectRatio: 0.75, // Ajuste de tamaño de los elementos
+              childAspectRatio: 0.75, // Tamaño de elementos
             ),
             itemCount: menus.length > 6
                 ? 6
@@ -49,14 +48,13 @@ class _MenuSuggestedState extends State<MenuSuggested> {
             },
           );
         } else {
-          return const Center(
-              child: Text('No se encontraron menús')); // Si no hay menús
+          return const Center(child: Text('No se encontraron menús'));
         }
       },
     );
   }
 
-  // Widget para construir un elemento del Menú Sugerido usando los datos del backend
+  // Widget del "Menú sugerido" usando los datos del backend
   Widget _buildMenuSuggestedItem(dynamic menu) {
     return Card(
       shape: RoundedRectangleBorder(

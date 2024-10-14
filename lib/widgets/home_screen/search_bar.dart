@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomeSearchBar extends StatefulWidget {
-  final Function(String) onSearch; // Callback búsqueda
+  final Function(String) onSearch;
 
   const HomeSearchBar({super.key, required this.onSearch});
 
@@ -27,7 +27,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
           fillColor: Colors.white,
           filled: true,
         ),
-        onChanged: widget.onSearch, // Llama al callback
+        onChanged: widget.onSearch,
       ),
     );
   }
