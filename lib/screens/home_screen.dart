@@ -16,37 +16,30 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String userName = "Usuario";
-  int _selectedIndex = 0; //indice de ventanas
+  int _selectedIndex = 0; // Índice de ventanas
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
-  } //Cargar usuario al inicio
+  } // Cargar usuario al inicio
 
   Future<void> _loadUserName() async {
-    final fetchedUserName = await fetchUserName(3);
+    final fetchedUserName =
+        await fetchUserName(3); // Obtener el nombre del usuario
     setState(() {
       userName = fetchedUserName;
-    }); //hacer llamado a la bd para obtener un usuario
-  }
-
-  // enlistar busqueda
-  List<String> _searchResults = [];
-  void _onSearch(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults.clear();
-      });
-      return;
-    }
-    final results = await performSearch(query);
-    setState(() {
-      _searchResults = results;
     });
   }
 
-  // Cambiar de screen
+  // Método de búsqueda
+  Future<List<String>> _performSearch(String query) async {
+    final results =
+        await performSearch(query); // Realizar búsqueda en el backend
+    return results;
+  }
+
+  // Cambiar de pantalla
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -118,38 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: HomeSearchBar(
-                onSearch: _onSearch,
+                onSearch: _performSearch, // Pasamos la función de búsqueda
               ),
             ),
           ),
-          // Sugerencias de búsqueda
-          if (_searchResults.isNotEmpty)
-            Positioned(
-              top: 80,
-              left: 16,
-              right: 16,
-              child: Material(
-                elevation: 5,
-                borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    children: List.generate(_searchResults.length, (index) {
-                      return ListTile(
-                        leading: const Icon(Icons.search, color: Colors.grey),
-                        title: Text(_searchResults[index]),
-                        onTap: () {
-                          print('Seleccionado: ${_searchResults[index]}');
-                        },
-                      );
-                    }),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
       bottomNavigationBar: BottomMenuBar(
