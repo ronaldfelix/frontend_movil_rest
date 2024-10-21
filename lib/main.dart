@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'config/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,12 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Restaurant App',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
+      title: 'App Restaurante',
+      theme: ThemeData(primarySwatch: Colors.blueGrey),
+      onGenerateRoute: AppRoutes.generateRoute,
+      initialRoute: AppRoutes.home,
     );
   }
 }

@@ -1,5 +1,5 @@
-import 'package:com_restaurante_frontend_movil/services/search_service.dart';
 import 'package:flutter/material.dart';
+import '../services/search_service.dart';
 import '../widgets/menu_screen/menu_suggested.dart';
 import '../widgets/menu_bar.dart';
 import '../widgets/home_screen/search_bar.dart';
@@ -12,25 +12,11 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int _selectedIndex = 1;
   String userName = "Usuario";
-
-  // Cambiar pestañas
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navegar a pestaña anterior
-    if (index == 0) {
-      Navigator.pop(context);
-    }
-  }
 
   // Método de búsqueda
   Future<List<String>> _performSearch(String query) async {
-    final results =
-        await performSearch(query); // Realizar búsqueda en el backend
+    final results = await performSearch(query);
     return results;
   }
 
@@ -47,7 +33,7 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: HomeSearchBar(
-                onSearch: _performSearch, // Pasar la función de búsqueda
+                onSearch: _performSearch,
               ),
             ),
           ),
@@ -70,24 +56,10 @@ class _MenuScreenState extends State<MenuScreen> {
               ],
             ),
           ),
-          // Barra de búsqueda en la parte superior
-          Positioned(
-            top: 30,
-            left: 16,
-            right: 16,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: HomeSearchBar(
-                onSearch: _performSearch, // Pasamos la función de búsqueda
-              ),
-            ),
-          ),
         ],
       ),
-      // Barra de menú en la parte inferior
-      bottomNavigationBar: BottomMenuBar(
-        currentIndex: _selectedIndex,
-        onTap: _onTabTapped,
+      bottomNavigationBar: const BottomMenuBar(
+        currentIndex: 1,
       ),
     );
   }

@@ -10,13 +10,13 @@ class MenuSuggested extends StatefulWidget {
 }
 
 class _MenuSuggestedState extends State<MenuSuggested> {
-  late Future<List<dynamic>>
-      _menus; // Almacenar la lista de menús que se cargará
+  late Future<List<dynamic>> _menus;
+  bool _showAll = false;
 
   @override
   void initState() {
     super.initState();
-    _menus = MenuService().fetchMenus(); // Cargar los menús al iniciar
+    _menus = MenuService().fetchMenus();
   }
 
   @override
@@ -31,21 +31,37 @@ class _MenuSuggestedState extends State<MenuSuggested> {
         } else if (snapshot.hasData) {
           final menus = snapshot.data!;
 
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.75, // Tamaño de elementos
-            ),
-            itemCount: menus.length > 6
-                ? 6
-                : menus.length, // Limitar a 6 menús sugeridos
-            itemBuilder: (context, index) {
-              return _buildMenuSuggestedItem(menus[index]);
-            },
+          final displayMenus = _showAll ? menus : menus.take(6).toList();
+
+          return Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  physics: const BouncingScrollPhysics(), //scrool rebote xd
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: displayMenus.length, // Mostrar 6 o todos
+                  itemBuilder: (context, index) {
+                    return _buildMenuSuggestedItem(displayMenus[index]);
+                  },
+                ),
+              ),
+              // Botón "Ver más" o "Ver menos" según el estado
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _showAll =
+                        !_showAll; // Cambiar entre mostrar todos o solo 6
+                  });
+                },
+                child:
+                    Text(_showAll ? 'Ver menú sugerido' : 'Ver menú completo'),
+              ),
+            ],
           );
         } else {
           return const Center(child: Text('No se encontraron menús'));
@@ -54,7 +70,7 @@ class _MenuSuggestedState extends State<MenuSuggested> {
     );
   }
 
-  // Widget del "Menú sugerido" usando los datos del backend
+  // Widget del "Menú sugerido"
   Widget _buildMenuSuggestedItem(dynamic menu) {
     return Card(
       shape: RoundedRectangleBorder(
