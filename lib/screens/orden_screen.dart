@@ -40,7 +40,8 @@ class _OrdenScreenState extends State<OrdenScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Carrito de Compras'),
+        centerTitle: true,
+        title: const Text('Mi orden'),
       ),
       body: Column(
         children: [
