@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../config/config.dart';
 
 class MenuDetailModal extends StatelessWidget {
-  final dynamic pedido; // Información del pedido
-  final VoidCallback onAddToCart; // Función para añadir al carrito
+  final dynamic pedido;
+  final VoidCallback onAddToCart;
 
   const MenuDetailModal({
-    Key? key,
+    super.key,
     required this.pedido,
     required this.onAddToCart,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +18,11 @@ class MenuDetailModal extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.75,
+          padding: const EdgeInsets.all(24.0),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Ajustar el tamaño al contenido
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Imagen del pedido
@@ -30,7 +32,8 @@ class MenuDetailModal extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   image: DecorationImage(
-                    image: NetworkImage(pedido['imagen_url']),
+                    image: NetworkImage(
+                        '${Config.baseUrl}/${pedido['imagen_url']}'),
                     fit: BoxFit.cover,
                   ),
                 ),

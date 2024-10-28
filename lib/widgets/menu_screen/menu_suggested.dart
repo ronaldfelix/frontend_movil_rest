@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/menu_service.dart';
 import '../../config/config.dart';
+import '../../widgets/menu_detail_modal.dart';
+import '../../screens/orden_screen.dart';
 
 class MenuSuggested extends StatefulWidget {
   const MenuSuggested({super.key});
@@ -19,6 +21,29 @@ class _MenuSuggestedState extends State<MenuSuggested> {
     _menus = MenuService().fetchMenus();
   }
 
+  // Función para mostrar el modal de detalles del menú
+  void _showMenuDetail(BuildContext context, dynamic menu) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return MenuDetailModal(
+          pedido: menu,
+          onAddToCart: () {
+            Navigator.of(context).pop(); // Cerrar el modal
+            OrdenScreen.addToCart({
+              'nombre': menu['nombre'],
+              'imagen_url': '${Config.baseUrl}/${menu['imagen_url']}',
+              'precio': menu['precio'],
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Añadido al carrito')),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
@@ -30,32 +55,33 @@ class _MenuSuggestedState extends State<MenuSuggested> {
           return const Center(child: Text('Error al cargar los menús'));
         } else if (snapshot.hasData) {
           final menus = snapshot.data!;
-
           final displayMenus = _showAll ? menus : menus.take(6).toList();
 
           return Column(
             children: [
               Expanded(
                 child: GridView.builder(
-                  physics: const BouncingScrollPhysics(), //scrool rebote xd
+                  physics: const BouncingScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     childAspectRatio: 0.75,
                   ),
-                  itemCount: displayMenus.length, // Mostrar 6 o todos
+                  itemCount: displayMenus.length,
                   itemBuilder: (context, index) {
-                    return _buildMenuSuggestedItem(displayMenus[index]);
+                    final menu = displayMenus[index];
+                    return GestureDetector(
+                      onTap: () => _showMenuDetail(context, menu),
+                      child: _buildMenuSuggestedItem(menu),
+                    );
                   },
                 ),
               ),
-              // Botón "Ver más" o "Ver menos" según el estado
               TextButton(
                 onPressed: () {
                   setState(() {
-                    _showAll =
-                        !_showAll; // Cambiar entre mostrar todos o solo 6
+                    _showAll = !_showAll;
                   });
                 },
                 child:

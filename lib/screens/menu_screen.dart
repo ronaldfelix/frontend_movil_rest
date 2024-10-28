@@ -38,11 +38,11 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           ),
           // Contenido del Menú Sugerido
-          Padding(
-            padding: const EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
+          const Padding(
+            padding: EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 SizedBox(height: 20),
                 Text(
                   'Menú Sugerido',
@@ -52,7 +52,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Expanded(child: MenuSuggested()), // Muestra el menú sugerido
+                Expanded(child: MenuSuggested()), // menú sugerido
               ],
             ),
           ),

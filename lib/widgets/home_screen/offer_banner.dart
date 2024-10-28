@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import '../../services/menu_service.dart';
 import '../../config/config.dart';
+import '../../widgets/menu_detail_modal.dart';
+import '../../screens/orden_screen.dart';
 
 class OfferBanner extends StatefulWidget {
   const OfferBanner({super.key});
@@ -17,6 +19,29 @@ class _OfferBannerState extends State<OfferBanner> {
   void initState() {
     super.initState();
     _offers = MenuService().fetchMenus();
+  }
+
+  // Función para mostrar el modal de detalles del menú
+  void _showMenuDetail(BuildContext context, dynamic offer) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return MenuDetailModal(
+          pedido: offer,
+          onAddToCart: () {
+            Navigator.of(context).pop(); // Cerrar el modal
+            OrdenScreen.addToCart({
+              'nombre': offer['nombre'],
+              'imagen_url': '${Config.baseUrl}/${offer['imagen_url']}',
+              'precio': offer['precio'],
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Añadido al carrito')),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -35,7 +60,10 @@ class _OfferBannerState extends State<OfferBanner> {
             itemCount: offers.length,
             itemBuilder: (context, index, realIndex) {
               final offer = offers[index];
-              return _buildOfferItem(offer);
+              return GestureDetector(
+                onTap: () => _showMenuDetail(context, offer),
+                child: _buildOfferItem(offer),
+              );
             },
             options: CarouselOptions(
               height: 150,
@@ -44,9 +72,6 @@ class _OfferBannerState extends State<OfferBanner> {
               enlargeCenterPage: true,
               viewportFraction: 0.8,
               aspectRatio: 16 / 9,
-              onPageChanged: (index, reason) {
-                setState(() {});
-              },
             ),
           );
         } else {

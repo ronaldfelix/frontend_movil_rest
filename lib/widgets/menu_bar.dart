@@ -8,9 +8,9 @@ class BottomMenuBar extends StatelessWidget {
   final int currentIndex;
 
   const BottomMenuBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
-  }) : super(key: key);
+  });
 
   // Navegar según el índice
   void _navigateToScreen(BuildContext context, int index) {
