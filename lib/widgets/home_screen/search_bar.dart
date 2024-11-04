@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class HomeSearchBar extends StatefulWidget {
   final Function(String) onSearch;
+  final Function(String) onSelectedResult;
 
-  const HomeSearchBar({super.key, required this.onSearch});
+  const HomeSearchBar({
+    super.key,
+    required this.onSearch,
+    required this.onSelectedResult,
+  });
 
   @override
   _HomeSearchBarState createState() => _HomeSearchBarState();
@@ -14,18 +19,16 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
   List<String> _searchResults = [];
 
   void _handleSearch(String query) async {
-    widget.onSearch(query);
     if (query.isEmpty) {
       setState(() {
-        _searchResults.clear(); // Limpiar resultados
+        _searchResults.clear(); // Limpiar resultados cuando el campo está vacío
       });
       return;
     }
 
-    final results =
-        await widget.onSearch(query); // Llamada para obtener resultados
+    final results = await widget.onSearch(query);
     setState(() {
-      _searchResults = results; // Actualizar los res busqueda
+      _searchResults = results;
     });
   }
 
@@ -47,7 +50,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
               fillColor: Colors.white,
               filled: true,
             ),
-            onChanged: _handleSearch, // Si cambia llama busqueda
+            onChanged: _handleSearch,
           ),
         ),
         if (_searchResults.isNotEmpty)
@@ -67,7 +70,13 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                       leading: const Icon(Icons.search, color: Colors.grey),
                       title: Text(_searchResults[index]),
                       onTap: () {
-                        print('Seleccionado: ${_searchResults[index]}');
+                        // Autocompletar la barra de búsqueda con el resultado seleccionado
+                        _searchController.text = _searchResults[index];
+                        widget.onSelectedResult(_searchResults[index]);
+                        setState(() {
+                          _searchResults
+                              .clear(); // Ocultar resultados al seleccionar
+                        });
                       },
                     );
                   }),

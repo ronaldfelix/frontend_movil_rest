@@ -92,7 +92,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: HomeSearchBar(
-                onSearch: _performSearch,
+                onSearch: _performSearch, // Función de búsqueda existente
+                onSelectedResult: (result) {
+                  // Aquí puedes manejar el resultado seleccionado
+                  print("Resultado seleccionado: $result");
+                },
               ),
             ),
           ),

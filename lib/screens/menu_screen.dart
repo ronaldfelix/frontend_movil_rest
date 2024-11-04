@@ -25,18 +25,6 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Barra de búsqueda en la parte superior
-          Positioned(
-            top: 30,
-            left: 16,
-            right: 16,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: HomeSearchBar(
-                onSearch: _performSearch,
-              ),
-            ),
-          ),
           // Contenido del Menú Sugerido
           const Padding(
             padding: EdgeInsets.only(top: 100.0, left: 16.0, right: 16.0),
@@ -54,6 +42,22 @@ class _MenuScreenState extends State<MenuScreen> {
                 SizedBox(height: 10),
                 Expanded(child: MenuSuggested()), // menú sugerido
               ],
+            ),
+          ),
+          // Barra de búsqueda en la parte superior (última posición para estar encima)
+          Positioned(
+            top: 30,
+            left: 16,
+            right: 16,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: HomeSearchBar(
+                onSearch: _performSearch, // Función de búsqueda existente
+                onSelectedResult: (result) {
+                  // Aquí puedes manejar el resultado seleccionado
+                  print("Resultado seleccionado: $result");
+                },
+              ),
             ),
           ),
         ],
