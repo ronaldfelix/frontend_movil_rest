@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/menu_bar.dart';
 
 class OrdenScreen extends StatefulWidget {
@@ -36,12 +37,54 @@ class _OrdenScreenState extends State<OrdenScreen> {
     });
   }
 
+  // Generate the QR data with cart details
+  String _generateQrData() {
+    List<Map<String, dynamic>> cartDetails = OrdenScreen._cart.map((item) {
+      return {
+        'nombre': item['nombre'],
+        'precio': item['precio'],
+        'cantidad': item['cantidad'],
+      };
+    }).toList();
+
+    return cartDetails.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: const Text('Mi orden'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code),
+            onPressed: () {
+              // Show a dialog with the QR code
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Código QR de la orden"),
+                  content: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: QrImageView(
+                      data: _generateQrData(),
+                      version: QrVersions.auto,
+                      size: 200.0,
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Cerrar"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -64,7 +107,6 @@ class _OrdenScreenState extends State<OrdenScreen> {
                       Text('S/. ${pedido['precio'].toString()}'),
                       Row(
                         children: [
-                          // Caja de cantidad
                           IconButton(
                             icon: const Icon(Icons.remove),
                             onPressed: () {
@@ -81,7 +123,6 @@ class _OrdenScreenState extends State<OrdenScreen> {
                             },
                           ),
                           const Spacer(),
-                          // Botón de eliminar
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () => _removeFromCart(index),
@@ -94,7 +135,6 @@ class _OrdenScreenState extends State<OrdenScreen> {
               },
             ),
           ),
-          // Mostrar el total y el botón para confirmar la orden
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -122,7 +162,6 @@ class _OrdenScreenState extends State<OrdenScreen> {
           ),
         ],
       ),
-      // Barra de menú en la parte inferior
       bottomNavigationBar: const BottomMenuBar(
         currentIndex: 2,
       ),
