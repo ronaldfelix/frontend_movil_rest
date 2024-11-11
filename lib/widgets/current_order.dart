@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class CurrentOrderWidget extends StatelessWidget {
   final List<Map<String, dynamic>> cart;
@@ -6,6 +7,7 @@ class CurrentOrderWidget extends StatelessWidget {
   final Function(int) removeFromCart;
   final Function() confirmOrder;
   final double total;
+  final bool isLoggedIn;
 
   const CurrentOrderWidget({
     Key? key,
@@ -14,7 +16,43 @@ class CurrentOrderWidget extends StatelessWidget {
     required this.removeFromCart,
     required this.confirmOrder,
     required this.total,
+    required this.isLoggedIn,
   }) : super(key: key);
+
+  void _handleOrderAction(BuildContext context) {
+    if (isLoggedIn) {
+      confirmOrder();
+    } else {
+      final cartDetails = cart.isNotEmpty
+          ? cart.take(5).map((item) {
+              return 'Nombre: ${item['nombre']}, Cantidad: ${item['cantidad']}, Precio: S/.${item['precio']}';
+            }).join("\n")
+          : "Carrito vacío";
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Código QR de tu pedido'),
+          content: SizedBox(
+            width: 200,
+            height: 200,
+            child: QrImageView(
+              // Usa QrImageView en lugar de QrImage
+              data: cartDetails,
+              version: QrVersions.auto,
+              size: 200.0,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cerrar'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +69,8 @@ class CurrentOrderWidget extends StatelessWidget {
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image),
                 ),
                 title: Text(pedido['nombre']),
                 subtitle: Column(
@@ -79,9 +119,11 @@ class CurrentOrderWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: confirmOrder,
-                child: const Text('Confirmar Orden'),
+              ElevatedButton.icon(
+                onPressed: () => _handleOrderAction(context),
+                icon: const Icon(Icons.qr_code),
+                label: Text(
+                    isLoggedIn ? 'Confirmar Orden' : 'Mostrar QR del Pedido'),
               ),
             ],
           ),

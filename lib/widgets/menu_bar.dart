@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/menu_screen.dart';
 import '../screens/orden_screen.dart';
-import '../screens/perfil_screen.dart';
 
 class BottomMenuBar extends StatelessWidget {
   final int currentIndex;
