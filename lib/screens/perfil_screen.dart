@@ -1,28 +1,39 @@
-import 'package:com_restaurante_frontend_movil/widgets/menu_bar.dart';
 import 'package:flutter/material.dart';
+import '../services/login_service.dart';
+import '../widgets/menu_bar.dart';
 
 class PerfilScreen extends StatefulWidget {
-  const PerfilScreen({super.key});
+  const PerfilScreen({Key? key}) : super(key: key);
 
   @override
   _PerfilScreenState createState() => _PerfilScreenState();
 }
 
 class _PerfilScreenState extends State<PerfilScreen> {
-  String userName = "Usuario";
-  String userEmail = "usuario@ejemplo.com";
+  Map<String, dynamic>? user; // Datos del usuario
+  bool isLoading = true; // Indicador de carga
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    _loadUserData();
   }
 
-  Future<void> _loadUserProfile() async {
+  // Método para cargar datos del usuario desde SQLite
+  Future<void> _loadUserData() async {
+    final loggedInUser = await LoginService.getLoggedInUser();
     setState(() {
-      userName = "Ronald García";
-      userEmail = "ronald.garcia@ejemplo.com";
+      user = loggedInUser;
+      isLoading =
+          false; // Cambia el estado de carga después de cargar los datos
     });
+  }
+
+  // Método para cerrar sesión
+  Future<void> _logout() async {
+    await LoginService.logout(); // Borra los datos del usuario en SQLite
+    Navigator.pushReplacementNamed(
+        context, '/login'); // Redirige a la pantalla de inicio de sesión
   }
 
   @override
@@ -31,60 +42,72 @@ class _PerfilScreenState extends State<PerfilScreen> {
       appBar: AppBar(
         title: const Text('Perfil'),
         backgroundColor: Colors.blueGrey,
+        automaticallyImplyLeading: false, // Oculta el botón de volver
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/profile_placeholder.png'),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              userName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              userEmail,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                // Implementar lógica de actualización de perfil
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Funcionalidad en desarrollo')),
-                );
-              },
-              child: const Text('Actualizar Perfil'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              onPressed: () {
-                // Implementar lógica de cerrar sesión
-                Navigator.pop(context);
-              },
-              child: const Text('Cerrar Sesión'),
-            ),
-          ],
-        ),
-      ),
-      // Agregar el menú inferior si es necesario
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator()) // Indicador de carga
+          : user == null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("No se encontraron datos del usuario."),
+                      ElevatedButton(
+                        onPressed: _logout,
+                        child: const Text("Iniciar Sesión"),
+                      ),
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      const CircleAvatar(
+                        radius: 50,
+                        backgroundImage:
+                            AssetImage('assets/profile_placeholder.png'),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        user!['nombre'] ?? 'Usuario',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user!['email'] ?? 'usuario@ejemplo.com',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        user!['telefono'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: _logout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text('Cerrar Sesión'),
+                      ),
+                    ],
+                  ),
+                ),
       bottomNavigationBar: const BottomMenuBar(
-        currentIndex: 3, // Índice actual para PerfilScreen
+        currentIndex: 0,
       ),
     );
   }

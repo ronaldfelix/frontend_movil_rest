@@ -4,7 +4,7 @@ import '../widgets/home_screen/offer_banner.dart';
 import '../widgets/home_screen/top_pedidos.dart';
 import '../widgets/menu_bar.dart';
 import '../services/search_service.dart';
-import '../services/user_service.dart';
+import '../services/login_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String userName = "Usuario";
+  String userName = "Bienvenido(a)";
 
   @override
   void initState() {
@@ -22,11 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUserName();
   }
 
-  // Cargar el nombre del usuario
+  // Cargar el nombre del usuario desde SQLite usando LoginService
   Future<void> _loadUserName() async {
-    final fetchedUserName = await fetchUserName(3); // Obtener el nombre
+    final user = await LoginService.getLoggedInUser();
+
     setState(() {
-      userName = fetchedUserName;
+      userName = user?['nombre'] ??
+          ""; // Si hay usuario, mostrar el nombre; si no, "Bienvenido(a)"
     });
   }
 
@@ -84,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Barra de búsqueda en la parte superior
           Positioned(
             top: 30,
             left: 16,
@@ -92,9 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: HomeSearchBar(
-                onSearch: _performSearch, // Función de búsqueda existente
+                onSearch: _performSearch,
                 onSelectedResult: (result) {
-                  // Aquí puedes manejar el resultado seleccionado
                   print("Resultado seleccionado: $result");
                 },
               ),
