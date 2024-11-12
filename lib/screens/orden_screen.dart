@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../widgets/menu_bar.dart';
-import '../widgets/current_order.dart';
-import '../widgets/confirmed_orders.dart';
+import '../widgets/orden_screen/current_order.dart';
+import '../widgets/orden_screen/confirmed_orders.dart';
 import '../config/database_helper.dart';
 
 class OrdenScreen extends StatefulWidget {
@@ -133,7 +133,7 @@ class _OrdenScreenState extends State<OrdenScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Mi Pedido'),
-            Tab(text: 'Mis Pedidos'),
+            Tab(text: 'Pedidos hechos'),
           ],
         ),
       ),

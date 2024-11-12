@@ -3,7 +3,7 @@ import '../services/login_service.dart';
 import '../config/routes.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.blueAccent,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.blueAccent, Colors.lightBlueAccent],
             begin: Alignment.topCenter,

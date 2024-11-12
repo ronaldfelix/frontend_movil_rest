@@ -10,14 +10,14 @@ class CurrentOrderWidget extends StatelessWidget {
   final bool isLoggedIn;
 
   const CurrentOrderWidget({
-    Key? key,
+    super.key,
     required this.cart,
     required this.updateQuantity,
     required this.removeFromCart,
     required this.confirmOrder,
     required this.total,
     required this.isLoggedIn,
-  }) : super(key: key);
+  });
 
   void _handleOrderAction(BuildContext context) {
     if (isLoggedIn) {

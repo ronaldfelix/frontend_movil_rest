@@ -36,7 +36,10 @@ class _OfferBannerState extends State<OfferBanner> {
               'precio': offer['precio'],
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Añadido al carrito')),
+              const SnackBar(
+                content: Text('Añadido'),
+                duration: Durations.short3,
+              ),
             );
           },
         );

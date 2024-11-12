@@ -40,7 +40,8 @@ class _TopPedidosState extends State<TopPedidos> {
             // notificación de éxito
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Añadido al carrito'),
+                content: Text('Añadido'),
+                duration: Durations.short3,
               ),
             );
           },

@@ -5,9 +5,9 @@ class QRButton extends StatelessWidget {
   final List<Map<String, dynamic>> order;
 
   const QRButton({
-    Key? key,
+    super.key,
     required this.order,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

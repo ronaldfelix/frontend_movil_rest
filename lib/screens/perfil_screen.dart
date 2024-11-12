@@ -3,7 +3,7 @@ import '../services/login_service.dart';
 import '../widgets/menu_bar.dart';
 
 class PerfilScreen extends StatefulWidget {
-  const PerfilScreen({Key? key}) : super(key: key);
+  const PerfilScreen({super.key});
 
   @override
   _PerfilScreenState createState() => _PerfilScreenState();
