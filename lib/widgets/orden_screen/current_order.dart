@@ -5,7 +5,7 @@ class CurrentOrderWidget extends StatelessWidget {
   final List<Map<String, dynamic>> cart;
   final Function(int, int) updateQuantity;
   final Function(int) removeFromCart;
-  final Function() confirmOrder;
+  final Function() confirmOrder; // Se mantiene sin modificar
   final double total;
   final bool isLoggedIn;
 
@@ -21,6 +21,7 @@ class CurrentOrderWidget extends StatelessWidget {
 
   void _handleOrderAction(BuildContext context) {
     if (isLoggedIn) {
+      // Aquí se llama a `confirmOrder` directamente sin cambios
       confirmOrder();
     } else {
       final cartDetails = cart.isNotEmpty
@@ -37,7 +38,6 @@ class CurrentOrderWidget extends StatelessWidget {
             width: 200,
             height: 200,
             child: QrImageView(
-              // Usa QrImageView en lugar de QrImage
               data: cartDetails,
               version: QrVersions.auto,
               size: 200.0,
@@ -122,8 +122,7 @@ class CurrentOrderWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () => _handleOrderAction(context),
                 icon: const Icon(Icons.qr_code),
-                label: Text(
-                    isLoggedIn ? 'Confirmar Orden' : 'Mostrar QR del Pedido'),
+                label: const Text('Confirmar Orden'),
               ),
             ],
           ),

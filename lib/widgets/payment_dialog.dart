@@ -4,8 +4,7 @@ import '../services/niubiz_service.dart';
 class PaymentDialog extends StatelessWidget {
   final VoidCallback onPaymentSuccess;
 
-  const PaymentDialog({Key? key, required this.onPaymentSuccess})
-      : super(key: key);
+  const PaymentDialog({super.key, required this.onPaymentSuccess});
 
   @override
   Widget build(BuildContext context) {
@@ -13,18 +12,62 @@ class PaymentDialog extends StatelessWidget {
     final TextEditingController expirationController = TextEditingController();
     final TextEditingController cvvController = TextEditingController();
 
-    Future<void> _processPayment(BuildContext context) async {
-      final accessToken = await NiubizService.getAccessToken();
+    Future<void> processPayment(BuildContext context) async {
+      try {
+        print("Iniciando proceso de pago...");
+        print("Número de tarjeta: ${cardNumberController.text}");
+        print("Fecha de expiración: ${expirationController.text}");
+        print("CVV: ${cvvController.text}");
 
-      if (accessToken != null) {
-        onPaymentSuccess();
-        Navigator.of(context).pop();
+        final accessToken = await NiubizService.getAccessToken();
+
+        if (accessToken != null) {
+          print("Access Token recibido exitosamente.");
+
+          const double requestedAmount = 10.5; // Monto simulado
+          const String purchaseNumber = "000001"; // Generar dinámicamente
+          final sessionResponse = await NiubizService.createSessionToken(
+              accessToken, requestedAmount);
+
+          if (sessionResponse != null &&
+              sessionResponse.containsKey('sessionKey')) {
+            final String sessionKey = sessionResponse['sessionKey'];
+
+            final authorizationResponse =
+                await NiubizService.authorizeTransaction(
+                    accessToken, sessionKey, purchaseNumber, requestedAmount);
+
+            if (authorizationResponse != null) {
+              NiubizService.validatePaymentResponse(
+                  authorizationResponse, requestedAmount);
+
+              onPaymentSuccess();
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Pago procesado exitosamente')),
+              );
+            } else {
+              print("Error: No se pudo autorizar la transacción.");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Error al procesar el pago')),
+              );
+            }
+          } else {
+            print("Error: No se pudo crear el Token de Sesión.");
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Error al procesar el pago')),
+            );
+          }
+        } else {
+          print("Error: No se pudo obtener el Access Token.");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al procesar el pago')),
+          );
+        }
+      } catch (e) {
+        print("Excepción durante el proceso de pago: $e");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pago procesado exitosamente')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al procesar el pago')),
+          const SnackBar(content: Text('Error inesperado al procesar el pago')),
         );
       }
     }
@@ -60,7 +103,7 @@ class PaymentDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            _processPayment(context);
+            processPayment(context);
           },
           child: const Text('Pagar'),
         ),
