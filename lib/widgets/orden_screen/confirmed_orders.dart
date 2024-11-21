@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../qr_button.dart';
-import '../payment_dialog.dart';
+import '..//niubiz_button.dart';
+import '..//qr_button.dart';
 
-class ConfirmedOrdersWidget extends StatefulWidget {
+class ConfirmedOrdersWidget extends StatelessWidget {
   final List<List<Map<String, dynamic>>> confirmedOrders;
   final Function(int, int, int) updateQuantity;
   final Function(int, int) removeFromOrder;
@@ -19,40 +19,26 @@ class ConfirmedOrdersWidget extends StatefulWidget {
   });
 
   @override
-  _ConfirmedOrdersWidgetState createState() => _ConfirmedOrdersWidgetState();
-}
-
-class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
-  bool isEditing = false;
-  bool paymentSuccessful = false; // New state variable
-
-  void _showPaymentDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => PaymentDialog(
-        onPaymentSuccess: () {
-          setState(() {
-            paymentSuccessful = true;
-          });
-        },
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: widget.confirmedOrders.length,
+      itemCount: confirmedOrders.length,
       itemBuilder: (context, orderIndex) {
-        final order = widget.confirmedOrders[orderIndex];
+        final order = confirmedOrders[orderIndex];
+        final totalAmount = calculateTotal(order);
+
         return Card(
           margin: const EdgeInsets.all(8.0),
           child: ExpansionTile(
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                    'Pedido ${orderIndex + 1} - Total: S/. ${widget.calculateTotal(order).toStringAsFixed(2)}'),
+                Expanded(
+                  child: Text(
+                    'Pedido ${orderIndex + 1} - Total: S/. ${totalAmount.toStringAsFixed(2)}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
                 QRButton(order: order),
               ],
             ),
@@ -66,41 +52,33 @@ class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('S/. ${pedido['precio']}'),
-                        if (!paymentSuccessful) // Only show buttons if payment is not done
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: isEditing
-                                    ? () {
-                                        if (pedido['cantidad'] > 1) {
-                                          widget.updateQuantity(orderIndex,
-                                              index, pedido['cantidad'] - 1);
-                                        }
-                                      }
-                                    : null,
-                              ),
-                              Text('${pedido['cantidad']}'),
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: isEditing
-                                    ? () {
-                                        widget.updateQuantity(orderIndex, index,
-                                            pedido['cantidad'] + 1);
-                                      }
-                                    : null,
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: isEditing
-                                    ? () => widget.removeFromOrder(
-                                        orderIndex, index)
-                                    : null,
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                if (pedido['cantidad'] > 1) {
+                                  updateQuantity(orderIndex, index,
+                                      pedido['cantidad'] - 1);
+                                }
+                              },
+                            ),
+                            Text('${pedido['cantidad']}'),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                updateQuantity(
+                                    orderIndex, index, pedido['cantidad'] + 1);
+                              },
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () =>
+                                  removeFromOrder(orderIndex, index),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   );
@@ -111,35 +89,13 @@ class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (paymentSuccessful)
-                      const Text(
-                        'Pago realizado correctamente',
-                        style: TextStyle(
-                            color: Colors.green, fontWeight: FontWeight.bold),
-                      )
-                    else ...[
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            isEditing = !isEditing;
-                          });
-                        },
-                        child: Text(
-                          isEditing ? 'Guardar Cambios' : 'Editar Orden',
-                          style: TextStyle(
-                              color: isEditing ? Colors.green : Colors.blue),
-                        ),
+                    Flexible(
+                      child: SizedBox(
+                        width: 180,
+                        height: 50,
+                        child: NiubizButton(amount: totalAmount),
                       ),
-                      TextButton(
-                        onPressed: () => widget.cancelOrder(orderIndex),
-                        child: const Text('Cancelar Orden',
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _showPaymentDialog(context),
-                        child: const Text('Pagar'),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
               ),

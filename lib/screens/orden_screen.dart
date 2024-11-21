@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import '../widgets/menu_bar.dart';
 import '../widgets/orden_screen/current_order.dart';
 import '../widgets/orden_screen/confirmed_orders.dart';
-import '../config/database_helper.dart';
 
 class OrdenScreen extends StatefulWidget {
   static final List<Map<String, dynamic>> _cart = [];
@@ -22,13 +19,11 @@ class OrdenScreen extends StatefulWidget {
 class _OrdenScreenState extends State<OrdenScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _checkLoginStatus();
   }
 
   @override
@@ -37,62 +32,18 @@ class _OrdenScreenState extends State<OrdenScreen>
     super.dispose();
   }
 
-  Future<void> _checkLoginStatus() async {
-    final user = await DatabaseHelper().getUser();
-    setState(() {
-      isLoggedIn = user != null;
-    });
-  }
-
   double _calculateTotal(List<Map<String, dynamic>> items) {
     return items.fold(
         0.0, (sum, item) => sum + item['precio'] * item['cantidad']);
   }
 
   void _confirmOrder() {
-    if (!isLoggedIn) {
-      // Mostrar QR provisional y mensaje de inicio de sesión
-      _showLoginRequiredDialog();
-    } else {
-      setState(() {
-        OrdenScreen._confirmedOrders.add(List.from(OrdenScreen._cart));
-        OrdenScreen._cart.clear();
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Orden confirmada')),
-      );
-    }
-  }
-
-  void _showLoginRequiredDialog() {
-    // Crear el contenido del QR usando los elementos del carrito
-    final cartDetails = OrdenScreen._cart.map((item) {
-      return 'Nombre: ${item['nombre']}, Cantidad: ${item['cantidad']}, Precio: S/.${item['precio']}';
-    }).join("\n");
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Necesitas iniciar sesión'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Para confirmar tu orden, por favor inicia sesión.'),
-            const SizedBox(height: 10),
-            QrImageView(
-              data: cartDetails,
-              version: QrVersions.auto,
-              size: 200.0,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
+    setState(() {
+      OrdenScreen._confirmedOrders.add(List.from(OrdenScreen._cart));
+      OrdenScreen._cart.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Orden confirmada')),
     );
   }
 
@@ -147,7 +98,7 @@ class _OrdenScreenState extends State<OrdenScreen>
             removeFromCart: (index) => _removeFromOrder(-1, index),
             confirmOrder: _confirmOrder,
             total: _calculateTotal(OrdenScreen._cart),
-            isLoggedIn: isLoggedIn,
+            isLoggedIn: true, // Cambiar según sea necesario
           ),
           ConfirmedOrdersWidget(
             confirmedOrders: OrdenScreen._confirmedOrders,
@@ -157,9 +108,6 @@ class _OrdenScreenState extends State<OrdenScreen>
             calculateTotal: _calculateTotal,
           ),
         ],
-      ),
-      bottomNavigationBar: const BottomMenuBar(
-        currentIndex: 2,
       ),
     );
   }

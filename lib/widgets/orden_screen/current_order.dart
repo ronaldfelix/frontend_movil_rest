@@ -5,7 +5,7 @@ class CurrentOrderWidget extends StatelessWidget {
   final List<Map<String, dynamic>> cart;
   final Function(int, int) updateQuantity;
   final Function(int) removeFromCart;
-  final Function() confirmOrder; // Se mantiene sin modificar
+  final Function() confirmOrder;
   final double total;
   final bool isLoggedIn;
 
@@ -18,41 +18,6 @@ class CurrentOrderWidget extends StatelessWidget {
     required this.total,
     required this.isLoggedIn,
   });
-
-  void _handleOrderAction(BuildContext context) {
-    if (isLoggedIn) {
-      // Aquí se llama a `confirmOrder` directamente sin cambios
-      confirmOrder();
-    } else {
-      final cartDetails = cart.isNotEmpty
-          ? cart.take(5).map((item) {
-              return 'Nombre: ${item['nombre']}, Cantidad: ${item['cantidad']}, Precio: S/.${item['precio']}';
-            }).join("\n")
-          : "Carrito vacío";
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Código QR de tu pedido'),
-          content: SizedBox(
-            width: 200,
-            height: 200,
-            child: QrImageView(
-              data: cartDetails,
-              version: QrVersions.auto,
-              size: 200.0,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +85,7 @@ class CurrentOrderWidget extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               ElevatedButton.icon(
-                onPressed: () => _handleOrderAction(context),
+                onPressed: confirmOrder,
                 icon: const Icon(Icons.qr_code),
                 label: const Text('Confirmar Orden'),
               ),
