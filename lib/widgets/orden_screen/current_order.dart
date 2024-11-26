@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class CurrentOrderWidget extends StatelessWidget {
   final List<Map<String, dynamic>> cart;

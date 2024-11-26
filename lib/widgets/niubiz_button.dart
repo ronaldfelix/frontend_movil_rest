@@ -1,60 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import '../services/niubiz_service.dart';
+import '../screens/niubiz_webview.dart';
 
-class NiubizButton extends StatefulWidget {
+class NiubizButton extends StatelessWidget {
+  final NiubizService niubizService;
   final double amount;
+  final String purchaseNumber;
 
-  const NiubizButton({super.key, required this.amount});
+  NiubizButton({
+    required this.niubizService,
+    required this.amount,
+    required this.purchaseNumber,
+  });
 
-  @override
-  State<NiubizButton> createState() => _NiubizButtonState();
-}
-
-class _NiubizButtonState extends State<NiubizButton> {
-  late final MethodChannel _channel;
-
-  @override
-  void initState() {
-    super.initState();
-    _channel = const MethodChannel('niubiz_button');
-    _initializeButton();
-  }
-
-  Future<void> _initializeButton() async {
+  void _startPayment(BuildContext context) async {
     try {
-      final String? accessToken = await NiubizService.getAccessToken();
-      if (accessToken != null) {
-        final String? sessionToken =
-            await NiubizService.createSessionToken(accessToken, widget.amount);
-        if (sessionToken != null) {
-          await _channel.invokeMethod('initialize', {
-            'sessionToken': sessionToken,
-            'merchantId': "456879852",
-            'amount': widget.amount.toString(),
-            'expirationMinutes': 15,
-          });
-        } else {
-          print("Error al obtener token de sesión.");
-        }
-      } else {
-        print("Error al obtener token de acceso.");
-      }
+      final accessToken = await niubizService.fetchAccessToken();
+      final sessionToken =
+          await niubizService.fetchSessionToken(accessToken, amount);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NiubizWebView(
+            sessionToken: sessionToken,
+            amount: amount,
+            purchaseNumber: purchaseNumber,
+          ),
+        ),
+      );
     } catch (e) {
-      print("Error inicializando el botón Niubiz: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50.0,
-      child: UiKitView(
-        viewType: 'niubiz_button',
-        creationParamsCodec: const StandardMessageCodec(),
-      ),
+    return ElevatedButton(
+      onPressed: () => _startPayment(context),
+      child: Text('Iniciar Pago Niubiz'),
     );
   }
 }

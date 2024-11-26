@@ -1,8 +1,10 @@
+import 'package:com_restaurante_frontend_movil/services/niubiz_service.dart';
 import 'package:flutter/material.dart';
-import '..//niubiz_button.dart';
-import '..//qr_button.dart';
+import '../niubiz_button.dart';
+//
+import 'qr_button.dart';
 
-class ConfirmedOrdersWidget extends StatelessWidget {
+class ConfirmedOrdersWidget extends StatefulWidget {
   final List<List<Map<String, dynamic>>> confirmedOrders;
   final Function(int, int, int) updateQuantity;
   final Function(int, int) removeFromOrder;
@@ -19,12 +21,20 @@ class ConfirmedOrdersWidget extends StatelessWidget {
   });
 
   @override
+  _ConfirmedOrdersWidgetState createState() => _ConfirmedOrdersWidgetState();
+}
+
+class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
+  bool isEditing = false;
+
+  @override
   Widget build(BuildContext context) {
+    final niubizService = NiubizService('https://tu-backend.com');
     return ListView.builder(
-      itemCount: confirmedOrders.length,
+      itemCount: widget.confirmedOrders.length,
       itemBuilder: (context, orderIndex) {
-        final order = confirmedOrders[orderIndex];
-        final totalAmount = calculateTotal(order);
+        final order = widget.confirmedOrders[orderIndex];
+        final totalAmount = widget.calculateTotal(order);
 
         return Card(
           margin: const EdgeInsets.all(8.0),
@@ -52,33 +62,35 @@ class ConfirmedOrdersWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('S/. ${pedido['precio']}'),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                if (pedido['cantidad'] > 1) {
-                                  updateQuantity(orderIndex, index,
-                                      pedido['cantidad'] - 1);
-                                }
-                              },
-                            ),
-                            Text('${pedido['cantidad']}'),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () {
-                                updateQuantity(
-                                    orderIndex, index, pedido['cantidad'] + 1);
-                              },
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () =>
-                                  removeFromOrder(orderIndex, index),
-                            ),
-                          ],
-                        ),
+                        if (isEditing)
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  if (pedido['cantidad'] > 1) {
+                                    widget.updateQuantity(orderIndex, index,
+                                        pedido['cantidad'] - 1);
+                                  }
+                                },
+                              ),
+                              Text('${pedido['cantidad']}'),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  widget.updateQuantity(orderIndex, index,
+                                      pedido['cantidad'] + 1);
+                                },
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () =>
+                                    widget.removeFromOrder(orderIndex, index),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                   );
@@ -89,13 +101,51 @@ class ConfirmedOrdersWidget extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Flexible(
-                      child: SizedBox(
-                        width: 180,
-                        height: 50,
-                        child: NiubizButton(amount: totalAmount),
+                    if (isEditing)
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isEditing = false;
+                          });
+                        },
+                        child: const Text('Guardar Cambios',
+                            style: TextStyle(color: Colors.green)),
+                      )
+                    else
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isEditing = true;
+                          });
+                        },
+                        child: const Text('Editar Orden',
+                            style: TextStyle(color: Colors.blue)),
                       ),
+                    TextButton(
+                      onPressed: () {
+                        widget.cancelOrder(orderIndex);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Orden ${orderIndex + 1} cancelada correctamente'),
+                          ),
+                        );
+                      },
+                      child: const Text('Cancelar Orden',
+                          style: TextStyle(color: Colors.red)),
                     ),
+                    if (!isEditing)
+                      Flexible(
+                        child: SizedBox(
+                          width: 180,
+                          height: 50,
+                          child: NiubizButton(
+                            niubizService: niubizService,
+                            amount: 100.50,
+                            purchaseNumber: '987654321',
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

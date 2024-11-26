@@ -2,72 +2,66 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class NiubizService {
-  static const String _username = "integraciones@niubiz.com.pe";
-  static const String _password = "_7z3@8fF";
-  static const String _sandboxUrl =
-      "https://apisandbox.vnforappstest.com/api.security/v1/security";
-  static const String _merchantId = "456879852";
-  static const String _sessionUrl =
-      "https://apisandbox.vnforappstest.com/api.ecommerce/v2/ecommerce/token/session/$_merchantId";
+  final String backendUrl;
 
-  // Obtener token de acceso
-  static Future<String?> getAccessToken() async {
-    try {
-      const credentials = '$_username:$_password';
-      final encodedCredentials = base64Encode(utf8.encode(credentials));
-      final headers = {'Authorization': 'Basic $encodedCredentials'};
+  NiubizService(this.backendUrl);
 
-      final response =
-          await http.post(Uri.parse(_sandboxUrl), headers: headers);
+  /// Obtiene el token de acceso desde el backend
+  Future<String> fetchAccessToken() async {
+    final response = await http.post(
+      Uri.parse('$backendUrl/api/security/v1/security'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'username': 'integraciones@niubiz.com.pe',
+        'password': '_7z3@8fF',
+      }),
+    );
 
-      if (response.statusCode == 201) {
-        return response.body.trim();
-      } else {
-        print("Error al obtener token de acceso: ${response.body}");
-        return null;
-      }
-    } catch (e) {
-      print("Excepción al obtener token de acceso: $e");
-      return null;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['accessToken'];
+    } else {
+      throw Exception('Error al obtener el token de acceso: ${response.body}');
     }
   }
 
-  // Crear token de sesión
-  static Future<String?> createSessionToken(
-      String accessToken, double amount) async {
-    try {
-      final headers = {
-        'Authorization': accessToken,
+  /// Genera un token de sesión utilizando el token de acceso
+  Future<String> fetchSessionToken(String accessToken, double amount) async {
+    final response = await http.post(
+      Uri.parse(
+          '$backendUrl/api.ecommerce/v2/ecommerce/token/session/456879852'),
+      headers: {
         'Content-Type': 'application/json',
-      };
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'channel': 'web',
+        'amount': amount,
+        'antifraud': {
+          'clientIp': '24.252.107.29',
+          'merchantDefineData': {
+            'MDD15': 'Valor MDD 15',
+            'MDD20': 'Valor MDD 20',
+          },
+        },
+        'dataMap': {
+          'cardholderCity': 'Lima',
+          'cardholderCountry': 'PE',
+          'cardholderAddress': 'Av Jose Pardo 831',
+          'cardholderPostalCode': '12345',
+          'cardholderState': 'LIM',
+          'cardholderPhoneNumber': '987654321',
+        },
+      }),
+    );
 
-      final body = jsonEncode({
-        "channel": "web",
-        "amount": amount,
-        "antifraud": {
-          "clientIp": "24.252.107.29",
-          "merchantDefineData": {
-            "MDD4": "integraciones@niubiz.com.pe",
-            "MDD32": "JD1892639123",
-            "MDD75": "Registrado",
-            "MDD77": 458
-          }
-        }
-      });
-
-      final response =
-          await http.post(Uri.parse(_sessionUrl), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        return jsonResponse['sessionKey'];
-      } else {
-        print("Error al crear token de sesión: ${response.body}");
-        return null;
-      }
-    } catch (e) {
-      print("Excepción al crear token de sesión: $e");
-      return null;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['sessionKey'];
+    } else {
+      throw Exception('Error al generar el token de sesión: ${response.body}');
     }
   }
 }

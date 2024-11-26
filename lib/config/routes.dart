@@ -11,6 +11,7 @@ class AppRoutes {
   static const String order = '/order';
   static const String profile = '/profile';
   static const String login = '/login';
+  static const String pay = '/pay';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

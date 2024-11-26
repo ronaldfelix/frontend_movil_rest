@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/menu_bar.dart';
 import '../widgets/orden_screen/current_order.dart';
 import '../widgets/orden_screen/confirmed_orders.dart';
 
@@ -32,21 +33,30 @@ class _OrdenScreenState extends State<OrdenScreen>
     super.dispose();
   }
 
+  // Calcular el total de un pedido
   double _calculateTotal(List<Map<String, dynamic>> items) {
     return items.fold(
         0.0, (sum, item) => sum + item['precio'] * item['cantidad']);
   }
 
+  // Confirmar el pedido actual
   void _confirmOrder() {
-    setState(() {
-      OrdenScreen._confirmedOrders.add(List.from(OrdenScreen._cart));
-      OrdenScreen._cart.clear();
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Orden confirmada')),
-    );
+    if (OrdenScreen._cart.isNotEmpty) {
+      setState(() {
+        OrdenScreen._confirmedOrders.add(List.from(OrdenScreen._cart));
+        OrdenScreen._cart.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Orden confirmada')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El carrito está vacío')),
+      );
+    }
   }
 
+  // Actualizar la cantidad de un producto
   void _updateQuantity(int orderIndex, int itemIndex, int quantity) {
     setState(() {
       if (orderIndex == -1) {
@@ -58,6 +68,7 @@ class _OrdenScreenState extends State<OrdenScreen>
     });
   }
 
+  // Eliminar un producto de un pedido
   void _removeFromOrder(int orderIndex, int itemIndex) {
     setState(() {
       if (orderIndex == -1) {
@@ -68,10 +79,14 @@ class _OrdenScreenState extends State<OrdenScreen>
     });
   }
 
+  // Cancelar un pedido completo
   void _cancelOrder(int orderIndex) {
     setState(() {
       OrdenScreen._confirmedOrders.removeAt(orderIndex);
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Pedido cancelado')),
+    );
   }
 
   @override
@@ -98,7 +113,7 @@ class _OrdenScreenState extends State<OrdenScreen>
             removeFromCart: (index) => _removeFromOrder(-1, index),
             confirmOrder: _confirmOrder,
             total: _calculateTotal(OrdenScreen._cart),
-            isLoggedIn: true, // Cambiar según sea necesario
+            isLoggedIn: true, // Puedes manejar el estado de sesión aquí
           ),
           ConfirmedOrdersWidget(
             confirmedOrders: OrdenScreen._confirmedOrders,
@@ -108,6 +123,9 @@ class _OrdenScreenState extends State<OrdenScreen>
             calculateTotal: _calculateTotal,
           ),
         ],
+      ),
+      bottomNavigationBar: const BottomMenuBar(
+        currentIndex: 2,
       ),
     );
   }
