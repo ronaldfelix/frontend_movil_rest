@@ -1,7 +1,9 @@
-import 'package:com_restaurante_frontend_movil/services/niubiz_service.dart';
 import 'package:flutter/material.dart';
-import '../niubiz_button.dart';
-//
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../payment_button.dart';
+import '../payment_screen.dart';
 import 'qr_button.dart';
 
 class ConfirmedOrdersWidget extends StatefulWidget {
@@ -26,10 +28,10 @@ class ConfirmedOrdersWidget extends StatefulWidget {
 
 class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
   bool isEditing = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    final niubizService = NiubizService('https://tu-backend.com');
     return ListView.builder(
       itemCount: widget.confirmedOrders.length,
       itemBuilder: (context, orderIndex) {
@@ -135,14 +137,14 @@ class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
                           style: TextStyle(color: Colors.red)),
                     ),
                     if (!isEditing)
-                      Flexible(
+                      const Flexible(
                         child: SizedBox(
                           width: 180,
                           height: 50,
-                          child: NiubizButton(
-                            niubizService: niubizService,
-                            amount: 100.50,
-                            purchaseNumber: '987654321',
+                          child: PaymentButton(
+                            amount: 100.50, // Monto de la transacción
+                            purchaseNumber:
+                                '987654321', // Número único de pedido
                           ),
                         ),
                       ),
