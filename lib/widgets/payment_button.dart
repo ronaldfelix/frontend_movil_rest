@@ -10,8 +10,8 @@ class PaymentButton extends StatefulWidget {
   const PaymentButton({
     required this.amount,
     required this.purchaseNumber,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _PaymentButtonState createState() => _PaymentButtonState();

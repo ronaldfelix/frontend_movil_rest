@@ -47,7 +47,10 @@ class _OrdenScreenState extends State<OrdenScreen>
         OrdenScreen._cart.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Orden confirmada')),
+        const SnackBar(
+          content: Text('Orden confirmada'),
+          duration: Durations.short1,
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

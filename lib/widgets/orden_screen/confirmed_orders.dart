@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../payment_button.dart';
-import '../payment_screen.dart';
 import 'qr_button.dart';
 
 class ConfirmedOrdersWidget extends StatefulWidget {
@@ -137,12 +134,12 @@ class _ConfirmedOrdersWidgetState extends State<ConfirmedOrdersWidget> {
                           style: TextStyle(color: Colors.red)),
                     ),
                     if (!isEditing)
-                      const Flexible(
+                      Flexible(
                         child: SizedBox(
                           width: 180,
                           height: 50,
                           child: PaymentButton(
-                            amount: 100.50, // Monto de la transacción
+                            amount: totalAmount, // Monto dinámico
                             purchaseNumber:
                                 '987654321', // Número único de pedido
                           ),
