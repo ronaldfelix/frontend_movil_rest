@@ -1,9 +1,8 @@
-// lib/services/niubiz_service.dart
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class NiubizService {
-  static Future<void> authorizeTransaction({
+  static Future<Map<String, dynamic>> authorizeTransaction({
     required String purchaseNumber,
     required double amount,
   }) async {
@@ -23,13 +22,15 @@ class NiubizService {
       );
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        print("Transacción autorizada con éxito: $jsonResponse");
+        return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
-        print("Error al autorizar la transacción: ${response.body}");
+        // Manejo del caso de error (código 400)
+        final errorResponse = jsonDecode(response.body) as Map<String, dynamic>;
+        errorResponse['statusCode'] = response.statusCode;
+        return errorResponse;
       }
     } catch (e) {
-      print("Error de red: $e");
+      throw Exception("Error de red: $e");
     }
   }
 }

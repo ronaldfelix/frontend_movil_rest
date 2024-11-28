@@ -3,6 +3,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../screens/confirmation_screen.dart';
 
+import '../services/niubiz_service.dart';
+
 class PaymentScreen extends StatefulWidget {
   final String sessionToken;
   final String merchantId;
@@ -34,19 +36,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
           onPageStarted: (String url) {
             print('Página cargando: $url');
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
             print('Página cargada: $url');
             if (url.contains('response-form')) {
-              // Redirigir a la pantalla de confirmación
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConfirmationScreen(
-                    purchaseNumber: widget.purchaseNumber,
-                    amount: widget.amount,
-                  ),
-                ),
-              );
+              await _handlePaymentValidation();
             }
           },
           onWebResourceError: (WebResourceError error) {
@@ -57,11 +50,38 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ..loadHtmlString(_generateHtml());
   }
 
-  String _generateHtml() {
-    // URL de tu backend para procesar la respuesta de Niubiz
-    final responseUrl =
-        "http://192.168.1.200:8080/api/niubiz/response-form?id=${widget.purchaseNumber}";
+  Future<void> _handlePaymentValidation() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
 
+    try {
+      final response = await NiubizService.authorizeTransaction(
+        purchaseNumber: widget.purchaseNumber,
+        amount: widget.amount,
+      );
+
+      Navigator.pop(context); // Cerrar pantalla de carga
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConfirmationScreen(response: response),
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Cerrar pantalla de carga
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al procesar el pago: $e")),
+      );
+    }
+  }
+
+  String _generateHtml() {
     return '''
     <!DOCTYPE html>
     <html lang="en">
@@ -72,24 +92,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
     </head>
     <body>
       <form action="http://192.168.1.200:8080/api/niubiz/response-form?id=${widget.purchaseNumber}" method="POST">
-  <script
-    src="https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true"
-    data-sessiontoken="${widget.sessionToken}"
-    data-channel="web"
-    data-merchantid="${widget.merchantId}"
-    data-merchantlogo="http://192.168.1.200:8080/images/helado_vainilla.jpg"
-    data-formbuttoncolor="#D80000"
-    data-purchasenumber="${widget.purchaseNumber}"
-    data-amount="${widget.amount.toStringAsFixed(2)}"
-    data-expirationminutes="20"
-    data-timeouturl="http://192.168.1.200:8080/api/niubiz/timeout"
-    data-showamount="true">
-  </script>
-</form>
-
+        <script
+          src="https://static-content-qas.vnforapps.com/v2/js/checkout.js?qa=true"
+          data-sessiontoken="${widget.sessionToken}"
+          data-channel="web"
+          data-merchantid="${widget.merchantId}"
+          data-merchantlogo="http://192.168.1.200:8080/images/helado_vainilla.jpg"
+          data-formbuttoncolor="#D80000"
+          data-purchasenumber="${widget.purchaseNumber}"
+          data-amount="${widget.amount.toStringAsFixed(2)}"
+          data-expirationminutes="20"
+          data-timeouturl="http://192.168.1.200:8080/api/niubiz/timeout"
+          data-showamount="true">
+        </script>
+      </form>
     </body>
     </html>
-  ''';
+    ''';
   }
 
   @override
